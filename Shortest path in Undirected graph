@@ -1,0 +1,123 @@
+package SSSP;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class SsspBfs {
+
+	/*
+	 * We first initialize an array dist[0, 1, …., v-1] such that dist[i] stores the
+	 * distance of vertex i from the source vertex and array pred[0, 1, ….., v-1]
+	 * such that pred[i] represents the immediate predecessor of the vertex i in the
+	 * breadth first search starting from the source.
+	 */
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int v = 8;
+		LinkedList<Integer> adj[] = new LinkedList[v];
+		for (int i = 0; i < v; i++) {
+			adj[i] = new LinkedList<Integer>();
+		}
+
+		add_edge(adj, 0, 1);
+		add_edge(adj, 0, 3);
+		add_edge(adj, 1, 2);
+		add_edge(adj, 3, 4);
+		add_edge(adj, 3, 7);
+		add_edge(adj, 4, 5);
+		add_edge(adj, 4, 6);
+		add_edge(adj, 4, 7);
+		add_edge(adj, 5, 6);
+		add_edge(adj, 6, 7);
+		int source = 0, dest = 7;
+		printShortestDistance(adj, source, dest, v);
+
+	}
+
+	private static void printShortestDistance(LinkedList<Integer>[] adj, int source, int dest, int v) {
+		// predecessor[i] array stores predecessor of
+		// i and distance array stores distance of i
+		// from s
+		int pred[] = new int[v];
+		int dist[] = new int[v];
+
+		if (BFS(adj, source, dest, v, pred, dist) == false) {
+			System.out.println("Given source and destination are not connected");
+		}
+
+		// List: path stores the shortest path
+		ArrayList<Integer> path = new ArrayList<>();
+		int crawl = dest;
+		path.add(crawl);
+		while (pred[crawl] != -1) {
+			path.add(pred[crawl]);
+			crawl = pred[crawl];
+		}
+
+		// distance from source is in distance array
+		System.out.println("Shortest path length is : " + dist[dest]);
+
+		// printing path from source to destination
+		System.out.println("\nPath is::");
+		for (int i = path.size() - 1; i >= 0; i--)
+			System.out.print(path.get(i) + " ");
+	}
+
+	private static boolean BFS(LinkedList<Integer>[] adj, int source, int dest, int v, int[] pred, int[] dist) {
+		// a queue to maintain queue of vertices whose
+		// adjacency list is to be scanned as per normal
+		// DFS algorithm
+		Queue<Integer> queue = new LinkedList<>();
+
+		// boolean array visited[] which stores the
+		// information whether ith vertex is reached
+		// at least once in the Breadth first search
+		boolean visited[] = new boolean[v];
+
+		// initially all vertices are unvisited
+		// so v[i] for all i is false
+		// and as no path is yet constructed
+		// dist[i] for all i set to infinity
+		for (int i = 0; i < v; i++) {
+			visited[i] = false;
+			dist[i] = Integer.MAX_VALUE;
+			pred[i] = -1;
+		}
+
+		// now source is first to be visited and
+		// distance from source to itself should be 0
+		visited[source] = true;
+		dist[source] = 0;
+		queue.add(source);
+
+		// standard BFS algorithm
+		while (!queue.isEmpty()) {
+			int u = queue.peek();
+			queue.poll();
+			for (int i = 0; i < adj[u].size(); i++) {
+				if (visited[adj[u].get(i)] == false) {
+					visited[adj[u].get(i)] = true;
+					dist[adj[u].get(i)] = dist[u] + 1;
+					pred[adj[u].get(i)] = u;
+					queue.add(adj[u].get(i));
+
+					// We stop BFS when we find
+					// destination.
+					if (adj[u].get(i) == dest)
+						return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private static void add_edge(LinkedList<Integer>[] adj, int src, int dest) {
+		adj[src].add(dest);
+		adj[dest].add(src);
+
+	}
+
+}
